@@ -74,7 +74,6 @@ router.post('/user', upload.single('image'), async (req, res) => {
 router.post('/user/login', async (req, res) => {
     const { email, password } = req.body
     const isExistAccount = await User.findOne({ email })
-
     if (!isExistAccount) {
         res.status(404).json({ message: 'User not found' })
         return

@@ -34,9 +34,9 @@ const disk = multer.diskStorage({
 
 const upload = multer({
     storage: disk,
-    fileFilter: (req, file, cb) => {
+    fileFilter: (_, file, cb) => {
         const ext = path.extname(file.originalname)
-        if (ext !== '.png' && ext !== '.jpeg' && ext !== '.jfif' && ext !== '.jpg' && ext !== '.mp4' && ext !== 'mkv') {
+        if (ext !== '.png' && ext !== '.jpeg' && ext !== '.jfif' && ext !== '.jpg' && ext !== '.mp4' && ext !== '.mkv') {
             cb(new Error('Select right file'), false)
         } else {
             cb(null, true)
@@ -44,7 +44,7 @@ const upload = multer({
     }
 })
 
-router.post('/post', upload.single('avatar'), async (req, res) => {
+router.post('/post', upload.single('image'), async (req, res) => {
     const { filename } = req.file
     const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
     const newObject = {
@@ -52,16 +52,31 @@ router.post('/post', upload.single('avatar'), async (req, res) => {
         src: `http://localhost:3000/routes/uploads/post/${filename}`,
         user: userId
     }
-    const post = await Post.create(newObject)
-    res.status(200).json({ post })
+    await Post.create(newObject)
+    res.status(200).json({ message: 'Success make your post' })
 })
 
 router.get('/posts/my', async (req, res) => {
     const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
-    const posts = await Post.find({ user: userId }).populate('user', '_id username src channel')
+    const posts = await Post.find({ user: userId }).populate('user', '_id username src')
     res.status(200).json({ posts })
 })
 
-router.get('/post')
+router.get('/posts', async (req, res) => {
+    const posts = await Post.find().populate('user', '_id username src')
+    res.status(200).json({ posts })
+})
+
+router.get('/post/:id', async (req, res) => {
+    const id = req.params.id
+    const post = await Post.findById(id).populate('user', '_id username src')
+    res.status(200).json(post)
+})
+
+router.get('/posts/:id', async (req, res) => {
+    const user = req.params.id
+    const posts = await Post.find({ }).populate('user', '_id username src')
+    res.status(200).json(posts)
+})
 
 export default router
