@@ -5,7 +5,7 @@ import bcrypt from "bcrypt"
 import multer from "multer"
 import path, { dirname } from "path"
 import { fileURLToPath } from "url"
-import { v4, v5 } from "uuid"
+import { v4 } from "uuid"
 const router = Router()
 
 const __filename = fileURLToPath(import.meta.url)
@@ -14,22 +14,15 @@ const __dirname = dirname(__filename)
 
 const disk = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '/uploads/images/'))
+        cb(null, path.join(__dirname, '/uploads/avatar/'))
     },
     filename: (req, file, cb) => {
-        cb(null, `image-${v4()}-${file.originalname}`)
+        cb(null, `image-${v4()}${path.extname(file.originalname)}`)
     }
 })
 
 const upload = multer({
     storage: disk,
-    fileFilter: (re, file, cb) => {
-        const ext = path.extname(file.originalname)
-        if (ext !== '.png' || ext !== '.jpeg' || ext !== '.jfif' || ext !== '.jpg') {
-            cb(new Error('Select right file'), false)
-        }
-        cb(null, true)
-    }
 })
 
 router.post('/user', upload.single('image'), async (req, res) => {
@@ -56,7 +49,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
         channel,
         email,
         password: hashPassword,
-        src: `http://localhost:3000/routes/uploads/images/${filename}`
+        src: `http://localhost:3000/routes/uploads/avatar/${filename}`
     }
 
     const user = await User.create(newObject)

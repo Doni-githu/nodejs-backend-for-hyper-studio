@@ -5,6 +5,8 @@ import multer from "multer"
 import { fileURLToPath } from "url"
 import { v4 } from "uuid"
 import { getToken } from "../jwt/token.js"
+import isHave from "../middleware/isHave.js"
+import { unlink } from "fs"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -21,27 +23,10 @@ const disk = multer.diskStorage({
     filename: (req, file, cb) => {
         cb(null, `post-${v4()}${path.extname(file.originalname)}`)
     },
-    onFileUploadStart: function (file) {
-        const ext = path.extname(file.originalname)
-        console.log("Inside uploads");
-        if (ext !== '.png' || ext !== '.jpeg' || ext !== '.jfif' || ext !== '.jpg' || ext !== '.mp4' || ext !== 'mkv') {
-            return false
-        } else {
-            return true
-        }
-    }
 })
 
 const upload = multer({
     storage: disk,
-    fileFilter: (_, file, cb) => {
-        const ext = path.extname(file.originalname)
-        if (ext !== '.png' && ext !== '.jpeg' && ext !== '.jfif' && ext !== '.jpg' && ext !== '.mp4' && ext !== '.mkv') {
-            cb(new Error('Select right file'), false)
-        } else {
-            cb(null, true)
-        }
-    }
 })
 
 router.post('/post', upload.single('image'), async (req, res) => {
@@ -55,13 +40,6 @@ router.post('/post', upload.single('image'), async (req, res) => {
     await Post.create(newObject)
     res.status(200).json({ message: 'Success make your post' })
 })
-
-router.get('/posts/my', async (req, res) => {
-    const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
-    const posts = await Post.find({ user: userId }).populate('user', '_id username src')
-    res.status(200).json({ posts })
-})
-
 router.get('/posts', async (req, res) => {
     const posts = await Post.find().populate('user', '_id username src')
     res.status(200).json({ posts })
@@ -75,8 +53,59 @@ router.get('/post/:id', async (req, res) => {
 
 router.get('/posts/:id', async (req, res) => {
     const user = req.params.id
-    const posts = await Post.find({ }).populate('user', '_id username src')
+    const posts = await Post.find({ user }).populate('user', '_id username src')
     res.status(200).json(posts)
 })
 
+router.put('/post/like/:id', isHave, (req, res) => {
+    Post.findByIdAndUpdate(req.params.id, {
+        $push: { likes: req.user._id }
+    }, {
+        new: true
+    }).exec((err, result) => {
+        if (err) {
+            res.status(422).json({ error: err })
+        }
+        res.status(201).json(result)
+    })
+})
+
+router.put('/post/unlike/:id', isHave, (req, res) => {
+    Post.findByIdAndUpdate(req.params.id, {
+        $pull: { likes: req.user._id }
+    }, {
+        new: true
+    }).exec((err, result) => {
+        if (err) {
+            res.status(422).json({ error: err })
+        }
+        res.status(201).json(result)
+    })
+})
+
+router.delete('/post/:id', async (req, res) => {
+    const id = req.params.id
+    await Post.findByIdAndRemove(id, { new: true })
+    res.status(202).json({ message: 'Success delete' })
+})
+
+router.put('/post', upload.single('image'), async (req, res) => {
+    const { filename } = req.file
+    const FoundPost = await Post.findById(req.body.id)
+    const newSRC = FoundPost.src.replace('http://localhost:3000/routes/uploads/post/', '')
+    const filepath = path.join(__dirname, 'uploads', 'post', newSRC)
+    const updatePost = {
+        title: req.body.title,
+        body: req.body.body,
+        type: req.body.type,
+        src: `http://localhost:3000/routes/uploads/post/${filename}`
+    }
+    await Post.findByIdAndUpdate(req.body.id, updatePost, {new: true})
+    unlink(filepath, (err) => {
+        if (err) {
+            res.status(422).json({ error: err })
+        }
+        res.json({ message: 'Success deleted file' })
+    })
+})
 export default router
