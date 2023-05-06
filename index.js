@@ -17,7 +17,10 @@ const __dirname = dirname(__filename)
 
 app.use('/routes/uploads/', express.static('./routes/uploads'))
 app.use(express.json())
-app.use(cors({ origin: '*' }))
+app.use(cors({
+    origin: '*',
+    allowedHeaders: '*'
+}))
 
 
 app.use('/api', UserRoutes)
@@ -29,7 +32,8 @@ const server = createServer(app)
 const io = new Server(server, {
     cors: {
         origin: '*',
-        methods: ['GET', 'POST', 'PUT']
+        methods: ['GET', 'POST', 'PUT'],
+        allowedHeaders: '*'
     },
 })
 
