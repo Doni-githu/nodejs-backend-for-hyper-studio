@@ -18,7 +18,7 @@ const __dirname = dirname(__filename)
 app.use('/routes/uploads/', express.static('./routes/uploads'))
 app.use(express.json())
 app.use(cors({
-    origin: '*',
+    origin: 'https://hyper-studio.onrender.com',
     allowedHeaders: '*'
 }))
 
@@ -31,7 +31,7 @@ app.use('/api', PostRoutes)
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: '*',
+        origin: 'https://hyper-studio.onrender.com',
         methods: ['GET', 'POST', 'PUT'],
         allowedHeaders: '*'
     },
