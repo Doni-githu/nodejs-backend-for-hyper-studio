@@ -27,15 +27,10 @@ const upload = multer({
 
 router.post('/user', upload.single('image'), async (req, res) => {
     const { filename } = req.file
-    const { username, channel, email, password } = req.body
+    const { username, email, password } = req.body
     const isHaveUsername = await User.findOne({ username: username })
     if (isHaveUsername) {
         res.status(400).json({ message: 'User name is taken' })
-        return
-    }
-    const isHaveChannel = await User.findOne({ channel: channel })
-    if (isHaveChannel) {
-        res.status(400).json({ message: 'Channel is taken' })
         return
     }
     const isHaveEmail = await User.findOne({ email: email })
@@ -46,7 +41,6 @@ router.post('/user', upload.single('image'), async (req, res) => {
     const hashPassword = await bcrypt.hash(password, 10)
     const newObject = {
         username,
-        channel,
         email,
         password: hashPassword,
         src: `http://localhost:3000/routes/uploads/avatar/${filename}`
@@ -57,7 +51,6 @@ router.post('/user', upload.single('image'), async (req, res) => {
     res.status(200).json({
         user: {
             username: user.username,
-            channel: user.channel,
             token: token,
             src: user.src
         }
@@ -78,11 +71,10 @@ router.post('/user/login', async (req, res) => {
         return
     }
 
-    const token = generateToken(isExistAccount._id, isExistAccount.channel)
+    const token = generateToken(isExistAccount._id)
     res.status(200).json({
         user: {
             username: isExistAccount.username,
-            channel: isExistAccount.channel,
             token,
             src: isExistAccount.src
         }
@@ -91,7 +83,7 @@ router.post('/user/login', async (req, res) => {
 
 router.get('/user', async (req, res) => {
     const token = req.headers.authorization.replace('Token ', '')
-    const { userId, channel } = getToken(token).payload
+    const { userId } = getToken(token).payload
     const user = await User.findById(userId)
     res.status(200).json({ user })
 })
