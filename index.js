@@ -34,7 +34,7 @@ const io = new Server(server, {
 })
 
 
-io.on('connect', socket => {
+io.on('connection', socket => {
     async function create(model, data2) {
         const result = await model.create(data2)
         return result
