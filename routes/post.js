@@ -79,6 +79,10 @@ router.put('/post/unlike/:id', isHave, async (req, res) => {
 
 router.delete('/post/:id', async (req, res) => {
     const id = req.params.id
+    const FoundPost = await Post.findById(id)
+    const filepath = path.join(__dirname, 'uploads', 'post', FoundPost.src.replace('https://nodejs-backend-application.onrender.com/routes/uploads/post/', ''))
+    unlink(filepath)
+    
     await Post.findByIdAndRemove(id, { new: true })
     res.status(202).json({ message: 'Success delete' })
 })
