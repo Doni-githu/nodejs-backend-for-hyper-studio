@@ -1,11 +1,11 @@
 import express from "express"
 import * as dotenv from "dotenv"
 dotenv.config()
+import { createServer } from "https"
 import UserRoutes from "./routes/user.js"
 import PostRoutes from "./routes/post.js"
 import mongoose from "mongoose"
 import cors from "cors"
-import { createServer } from "http"
 import { Server } from "socket.io"
 import { fileURLToPath } from "url"
 import path, { dirname } from "path"
