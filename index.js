@@ -17,7 +17,7 @@ const __dirname = dirname(__filename)
 
 app.use('/routes/uploads/', express.static('./routes/uploads'))
 app.use(express.json())
-app.use(cors({ origin: 'https://hyper-studio.onrender.com' }))
+app.use(cors({ origin: ['https://hyper-studio.onrender.com', 'http://localhost:5173'] }))
 
 
 app.use('/api', UserRoutes)
@@ -28,7 +28,7 @@ app.use('/api', PostRoutes)
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: 'https://hyper-studio.onrender.com',
+        origin: ['https://hyper-studio.onrender.com', 'http://localhost:5173'],
         methods: ['GET', 'POST', 'PUT']
     }
 })
