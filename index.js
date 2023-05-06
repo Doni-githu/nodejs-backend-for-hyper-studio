@@ -1,7 +1,7 @@
 import express from "express"
 import * as dotenv from "dotenv"
 dotenv.config()
-import { createServer } from "https"
+import { createServer } from "http"
 import UserRoutes from "./routes/user.js"
 import PostRoutes from "./routes/post.js"
 import mongoose from "mongoose"
