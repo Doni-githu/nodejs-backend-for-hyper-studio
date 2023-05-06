@@ -6,8 +6,18 @@ const PostSchema = new Schema({
     title: { type: String, required: true },
     body: { type: String, required: true },
     comments: [{
-        text: String,
-        user: { type: Schema.Types.ObjectId, ref: 'User' }
+        text: { type: String },
+        user: { type: Schema.Types.ObjectId, ref: 'User' },
+        active: { type: Boolean, default: false },
+        answer: [{
+            text: { type: String },
+            user: { type: Schema.Types.ObjectId, ref: 'User' },
+            active: { type: Boolean, default: false },
+            speaking: [{
+                text: { type: String },
+                user: { type: Schema.Types.ObjectId, ref: 'User' },
+            }]
+        }]
     }],
     likes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
     type: { type: String, required: true }

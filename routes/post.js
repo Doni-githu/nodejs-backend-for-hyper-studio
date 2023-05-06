@@ -1,6 +1,6 @@
 import { Router } from "express"
 import Post from "../models/Post.js"
-import path, { dirname } from "path"
+import path, { dirname, resolve } from "path"
 import multer from "multer"
 import { fileURLToPath } from "url"
 import { v4 } from "uuid"
@@ -47,40 +47,34 @@ router.get('/posts', async (req, res) => {
 
 router.get('/post/:id', async (req, res) => {
     const id = req.params.id
-    const post = await Post.findById(id).populate('user', '_id username src')
+    const post = await Post.findById(id)
+        .populate('user', '_id username src')
     res.status(200).json(post)
 })
 
 router.get('/posts/:id', async (req, res) => {
     const user = req.params.id
-    const posts = await Post.find({ user }).populate('user', '_id username src')
+    const posts = await Post.find({ user })
+        .populate('user', '_id username src')
     res.status(200).json(posts)
 })
 
-router.put('/post/like/:id', isHave, (req, res) => {
-    Post.findByIdAndUpdate(req.params.id, {
+router.put('/post/like/:id', isHave, async (req, res) => {
+    const updated = await Post.findByIdAndUpdate(req.params.id, {
         $push: { likes: req.user._id }
     }, {
         new: true
-    }).exec((err, result) => {
-        if (err) {
-            res.status(422).json({ error: err })
-        }
-        res.status(201).json(result)
     })
+    res.status(201).json(updated)
 })
 
-router.put('/post/unlike/:id', isHave, (req, res) => {
-    Post.findByIdAndUpdate(req.params.id, {
+router.put('/post/unlike/:id', isHave, async (req, res) => {
+    const updated = await Post.findByIdAndUpdate(req.params.id, {
         $pull: { likes: req.user._id }
     }, {
         new: true
-    }).exec((err, result) => {
-        if (err) {
-            res.status(422).json({ error: err })
-        }
-        res.status(201).json(result)
     })
+    res.status(201).json(updated)
 })
 
 router.delete('/post/:id', async (req, res) => {
@@ -94,18 +88,18 @@ router.put('/post', upload.single('image'), async (req, res) => {
     const FoundPost = await Post.findById(req.body.id)
     const newSRC = FoundPost.src.replace('http://localhost:3000/routes/uploads/post/', '')
     const filepath = path.join(__dirname, 'uploads', 'post', newSRC)
+    unlink(filepath, (err) => {
+        if (err) {
+            res.status(422).json({ error: err })
+        }
+        res.status(200).json({ message: 'Success update' })
+    })
     const updatePost = {
         title: req.body.title,
         body: req.body.body,
         type: req.body.type,
         src: `http://localhost:3000/routes/uploads/post/${filename}`
     }
-    await Post.findByIdAndUpdate(req.body.id, updatePost, {new: true})
-    unlink(filepath, (err) => {
-        if (err) {
-            res.status(422).json({ error: err })
-        }
-        res.json({ message: 'Success deleted file' })
-    })
+    await Post.findByIdAndUpdate(req.body.id, updatePost, { new: true })
 })
 export default router
