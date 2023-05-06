@@ -34,7 +34,7 @@ router.post('/post', upload.single('image'), async (req, res) => {
     const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
     const newObject = {
         ...req.body,
-        src: `http://localhost:3000/routes/uploads/post/${filename}`,
+        src: `https://nodejs-backend-application.onrender.com/routes/uploads/post/${filename}`,
         user: userId
     }
     await Post.create(newObject)
@@ -86,7 +86,7 @@ router.delete('/post/:id', async (req, res) => {
 router.put('/post', upload.single('image'), async (req, res) => {
     const { filename } = req.file
     const FoundPost = await Post.findById(req.body.id)
-    const newSRC = FoundPost.src.replace('http://localhost:3000/routes/uploads/post/', '')
+    const newSRC = FoundPost.src.replace('https://nodejs-backend-application.onrender.com/routes/uploads/post/', '')
     const filepath = path.join(__dirname, 'uploads', 'post', newSRC)
     unlink(filepath, (err) => {
         if (err) {
@@ -98,7 +98,7 @@ router.put('/post', upload.single('image'), async (req, res) => {
         title: req.body.title,
         body: req.body.body,
         type: req.body.type,
-        src: `http://localhost:3000/routes/uploads/post/${filename}`
+        src: `https://nodejs-backend-application.onrender.com/routes/uploads/post/${filename}`
     }
     await Post.findByIdAndUpdate(req.body.id, updatePost, { new: true })
 })

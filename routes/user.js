@@ -43,7 +43,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
         username,
         email,
         password: hashPassword,
-        src: `http://localhost:3000/routes/uploads/avatar/${filename}`
+        src: `https://nodejs-backend-application.onrender.com/routes/uploads/avatar/${filename}`
     }
 
     const user = await User.create(newObject)
