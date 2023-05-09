@@ -1,7 +1,7 @@
 import jsonwebtoken from "jsonwebtoken";
 
-const generateToken = (userId, channel) => {
-    const token = jsonwebtoken.sign({ userId, channel }, process.env.SECRET_KEY)
+const generateToken = (userId) => {
+    const token = jsonwebtoken.sign({ userId }, process.env.SECRET_KEY)
     return token
 }
 
