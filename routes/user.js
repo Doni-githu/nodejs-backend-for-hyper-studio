@@ -47,7 +47,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
     }
 
     const user = await User.create(newObject)
-    const token = generateToken(user._id, user.channel)
+    const token = generateToken(user._id)
     res.status(200).json({
         user: {
             username: user.username,
