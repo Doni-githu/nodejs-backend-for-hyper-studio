@@ -14,7 +14,7 @@ const __dirname = dirname(__filename)
 
 const router = Router()
 const disk = multer.diskStorage({
-    destination: (_, _, cb) => {
+    destination: (req, file, cb) => {
         cb(null, path.join(__dirname, '/uploads/post'))
     },
     limits: {
