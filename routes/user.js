@@ -44,7 +44,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
         username,
         email,
         password: hashPassword,
-        src: `${url}/avatar/${filename}`
+        src: `${url}avatar/${filename}`
     }
 
     const user = await User.create(newObject)
