@@ -9,8 +9,11 @@ import cors from "cors"
 import { Server } from "socket.io"
 import { fileURLToPath } from "url"
 import path, { dirname } from "path"
+import jwt from "jsonwebtoken"
 import GlobalChat from "./models/globalChat.js"
 import Post from "./models/Post.js"
+import { getToken } from "./jwt/token.js"
+import User from "./models/User.js"
 const app = express()
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -122,11 +125,15 @@ io.on('connection', socket => {
 
 
 
-function ServerDebug() {
+async function ServerDebug() {
     const PORT = process.env.PORT ?? 3000
-    mongoose.connect(process.env.URI_MONGODB)
-        .then(() => console.log('MongoDB was connected'))
-        .catch((error) => console.log("MongoDB wasn't connect because " + error))
+    try {
+        await mongoose.connect(process.env.URI_MONGODB)
+        console.log('MongoDB connection')
+
+    } catch (error) {
+        console.log("Message errror " + error)
+    }
     server.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);
     })

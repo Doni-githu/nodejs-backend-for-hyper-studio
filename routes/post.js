@@ -102,7 +102,7 @@ router.put('/post', upload.single('image'), async (req, res) => {
         title: req.body.title,
         body: req.body.body,
         type: req.body.type,
-        src: `https://nodejs-backend-application.onrender.com/routes/uploads/post/${filename}`
+        src: `https://localhost:3000/routes/uploads/post/${filename}`
     }
     await Post.findByIdAndUpdate(req.body.id, updatePost, { new: true })
 })
