@@ -7,6 +7,7 @@ import { v4 } from "uuid"
 import { getToken } from "../jwt/token.js"
 import isHave from "../middleware/isHave.js"
 import { unlink } from "fs"
+import { url } from "../staticUrl.js"
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -34,7 +35,7 @@ router.post('/post', upload.single('image'), async (req, res) => {
     const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
     const newObject = {
         ...req.body,
-        src: `https://nodejs-backend-application.onrender.com/routes/uploads/post/${filename}`,
+        src: `${url}/post/${filename}`,
         user: userId
     }
     await Post.create(newObject)
@@ -80,9 +81,9 @@ router.put('/post/unlike/:id', isHave, async (req, res) => {
 router.delete('/post/:id', async (req, res) => {
     const id = req.params.id
     const FoundPost = await Post.findById(id)
-    const filepath = path.join(__dirname, 'uploads', 'post', FoundPost.src.replace('https://nodejs-backend-application.onrender.com/routes/uploads/post/', ''))
+    const filepath = path.join(__dirname, 'uploads', 'post', FoundPost.src.replace(`${url}/post/`, ''))
     unlink(filepath)
-    
+
     await Post.findByIdAndRemove(id, { new: true })
     res.status(202).json({ message: 'Success delete' })
 })
@@ -90,7 +91,7 @@ router.delete('/post/:id', async (req, res) => {
 router.put('/post', upload.single('image'), async (req, res) => {
     const { filename } = req.file
     const FoundPost = await Post.findById(req.body.id)
-    const newSRC = FoundPost.src.replace('https://nodejs-backend-application.onrender.com/routes/uploads/post/', '')
+    const newSRC = FoundPost.src.replace(`${url}/post/`, '')
     const filepath = path.join(__dirname, 'uploads', 'post', newSRC)
     unlink(filepath, (err) => {
         if (err) {
@@ -102,7 +103,7 @@ router.put('/post', upload.single('image'), async (req, res) => {
         title: req.body.title,
         body: req.body.body,
         type: req.body.type,
-        src: `https://localhost:3000/routes/uploads/post/${filename}`
+        src: `${url}${filename}`
     }
     await Post.findByIdAndUpdate(req.body.id, updatePost, { new: true })
 })

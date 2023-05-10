@@ -6,6 +6,7 @@ import multer from "multer"
 import path, { dirname } from "path"
 import { fileURLToPath } from "url"
 import { v4 } from "uuid"
+import { url } from "../staticUrl.js";
 const router = Router()
 
 const __filename = fileURLToPath(import.meta.url)
@@ -43,7 +44,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
         username,
         email,
         password: hashPassword,
-        src: `https://nodejs-backend-application.onrender.com/routes/uploads/avatar/${filename}`
+        src: `${url}/avatar/${filename}`
     }
 
     const user = await User.create(newObject)

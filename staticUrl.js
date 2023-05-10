@@ -1,0 +1,1 @@
+export const url = 'https://nodejs-backend-application.onrender.com/routes/uploads/'
