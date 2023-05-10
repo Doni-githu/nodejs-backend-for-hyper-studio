@@ -1,6 +1,6 @@
 import { Router } from "express"
 import Post from "../models/Post.js"
-import path, { dirname, resolve } from "path"
+import path, { dirname } from "path"
 import multer from "multer"
 import { fileURLToPath } from "url"
 import { v4 } from "uuid"
@@ -14,7 +14,7 @@ const __dirname = dirname(__filename)
 
 const router = Router()
 const disk = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (_, _, cb) => {
         cb(null, path.join(__dirname, '/uploads/post'))
     },
     limits: {
