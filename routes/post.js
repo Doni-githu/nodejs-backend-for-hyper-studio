@@ -50,6 +50,9 @@ router.get('/post/:id', async (req, res) => {
     const id = req.params.id
     const post = await Post.findById(id)
         .populate('user', '_id username src')
+        .populate('comments.answer.user', '_id username src')
+        .populate('comments.user', '_id username src')
+        .populate('comments.answer.speaking.user', '_id username src')
     res.status(200).json(post)
 })
 
