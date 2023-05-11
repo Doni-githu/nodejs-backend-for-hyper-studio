@@ -9,6 +9,7 @@ import isHave from "../middleware/isHave.js"
 import { unlink } from "fs"
 import { url } from "../staticUrl.js"
 
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
@@ -35,7 +36,7 @@ router.post('/post', upload.single('image'), async (req, res) => {
     const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
     const newObject = {
         ...req.body,
-        src: `${url}/post/${filename}`,
+        src: `${url}post/${filename}`,
         user: userId
     }
     await Post.create(newObject)
@@ -84,7 +85,7 @@ router.put('/post/unlike/:id', isHave, async (req, res) => {
 router.delete('/post/:id', async (req, res) => {
     const id = req.params.id
     const FoundPost = await Post.findById(id)
-    const filepath = path.join(__dirname, 'uploads', 'post', FoundPost.src.replace(`${url}/post/`, ''))
+    const filepath = path.join(__dirname, 'uploads', 'post', FoundPost.src.replace(`${url}post/`, ''))
     unlink(filepath)
 
     await Post.findByIdAndRemove(id, { new: true })
@@ -94,7 +95,7 @@ router.delete('/post/:id', async (req, res) => {
 router.put('/post', upload.single('image'), async (req, res) => {
     const { filename } = req.file
     const FoundPost = await Post.findById(req.body.id)
-    const newSRC = FoundPost.src.replace(`${url}/post/`, '')
+    const newSRC = FoundPost.src.replace(`${url}post/`, '')
     const filepath = path.join(__dirname, 'uploads', 'post', newSRC)
     unlink(filepath, (err) => {
         if (err) {
@@ -106,8 +107,9 @@ router.put('/post', upload.single('image'), async (req, res) => {
         title: req.body.title,
         body: req.body.body,
         type: req.body.type,
-        src: `${url}${filename}`
+        src: `${url}post/${filename}`
     }
     await Post.findByIdAndUpdate(req.body.id, updatePost, { new: true })
 })
+
 export default router

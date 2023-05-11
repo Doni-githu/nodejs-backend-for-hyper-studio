@@ -6,6 +6,7 @@ import multer from "multer"
 import path, { dirname } from "path"
 import { fileURLToPath } from "url"
 import { v4 } from "uuid"
+import sendEmail from "../utils/sendEmail.js"
 import { url } from "../staticUrl.js";
 const router = Router()
 
@@ -43,19 +44,35 @@ router.post('/user', upload.single('image'), async (req, res) => {
     const newObject = {
         username,
         email,
+        channel: `@${username}`,
         password: hashPassword,
         src: `${url}avatar/${filename}`
     }
 
-    const user = await User.create(newObject)
-    const token = generateToken(user._id)
-    res.status(200).json({
-        user: {
-            username: user.username,
-            token: token,
-            src: user.src
+    const { _id } = await User.create(newObject)
+    const urlToEmail = `http://localhost:5173/users/${_id}/verify`
+    await sendEmail(email, "Verify Email", urlToEmail)
+    res.status(200).json({ messsage: 'Check your email' })
+})
+
+router.get('/:id/verify', async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+        const token = generateToken(req.params.id)
+        if (!user) {
+            res.status(400).json({ message: 'User not found' })
         }
-    })
+        const response = await User.findByIdAndUpdate(req.params.id, { verified: true }, { new: true })
+        const userInfo = {
+            response,
+            token
+        }
+        res.status(201).json({ user: userInfo })
+    } catch (error) {
+        if (error) {
+            res.status(500).json({ message: error })
+        }
+    }
 })
 
 router.post('/user/login', async (req, res) => {
@@ -69,6 +86,14 @@ router.post('/user/login', async (req, res) => {
     const compare = await bcrypt.compare(password, isExistAccount.password)
     if (!compare) {
         res.status(400).json({ message: 'Password is wrong' })
+        return
+    }
+
+    if (!isExistAccount.verified) {
+        console.log(isExistAccount)
+        const urlToEmail = `https://hyper-studio.onrender.com/users/${isExistAccount._id}/verify`
+        await sendEmail(email, "Verify Email", urlToEmail)
+        res.status(200).json({ message: 'Check your email' })
         return
     }
 
