@@ -90,10 +90,9 @@ router.post('/user/login', async (req, res) => {
     }
 
     if (!isExistAccount.verified) {
-        console.log(isExistAccount)
-        const urlToEmail = `https://hyper-studio.onrender.com/users/${isExistAccount._id}/verify`
         await sendEmail(email, "Verify Email", urlToEmail)
         res.status(200).json({ message: 'Check your email' })
+        const urlToEmail = `https://hyper-studio.onrender.com/users/${isExistAccount._id}/verify`
         return
     }
 
