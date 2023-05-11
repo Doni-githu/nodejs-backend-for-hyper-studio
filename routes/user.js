@@ -50,7 +50,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
     }
 
     const { _id } = await User.create(newObject)
-    const urlToEmail = `http://localhost:5173/users/${_id}/verify`
+    const urlToEmail = `https://hyper-studio.onrender.com/users/${_id}/verify`
     await sendEmail(email, "Verify Email", urlToEmail)
     res.status(200).json({ messsage: 'Check your email' })
 })
