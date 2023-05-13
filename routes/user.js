@@ -47,9 +47,10 @@ router.post('/user', upload.single('image'), async (req, res) => {
     }
 
     const { _id } = await User.create(newObject)
-    const urlToEmail = `https://hyper-studio.onrender.com/users/${_id}/verify`
+    const urlToEmail = `https://hyper-studio.netlify.app/users/${_id}`
     await sendEmail(email, "Verify Email", urlToEmail)
     res.status(200).json({ messsage: 'Check your email' })
+
 })
 
 router.get('/:id/verify', async (req, res) => {
@@ -70,6 +71,7 @@ router.get('/:id/verify', async (req, res) => {
             res.status(500).json({ message: 'Internal Server Error' })
         }
     }
+
 })
 
 router.post('/user/login', async (req, res) => {
