@@ -1,5 +1,4 @@
-import { model, Schema } from "mongoose";
-
+const { model, Schema } = require('mongoose')
 const OnlyChatSchema = new Schema({
     firstUser: { type: Schema.Types.ObjectId, ref: 'User' },
     secondUser: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -12,4 +11,4 @@ const OnlyChatSchema = new Schema({
 }, { timestamps: true })
 
 const OnlyChat = model('OnlyChat', OnlyChatSchema)
-export default OnlyChat
+module.exports = OnlyChat

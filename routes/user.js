@@ -1,17 +1,14 @@
-import { Router } from "express";
-import User from "../models/User.js";
-import { generateToken, getToken } from "../jwt/token.js"
-import bcrypt from "bcrypt"
-import multer from "multer"
-import path, { dirname } from "path"
-import { fileURLToPath } from "url"
-import { v4 } from "uuid"
-import sendEmail from "../utils/sendEmail.js"
-import { url } from "../staticUrl.js";
+const Router = require('express').Router
+const User = require('../models/User.js')
+const { generateToken, getToken } = require('../jwt/token.js')
+const bcrypt = require('bcrypt')
+const multer = require('multer')
+const v4 = require('uuid').v4
+const sendEmail = require('../utils/sendEmail.js')
+const url = require('../staticUrl.js')
+const passport = require('passport')
 const router = Router()
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const path = require('path')
 
 
 const disk = multer.diskStorage({
@@ -70,7 +67,7 @@ router.get('/:id/verify', async (req, res) => {
         res.status(201).json({ user: userInfo })
     } catch (error) {
         if (error) {
-            res.status(500).json({ message: error })
+            res.status(500).json({ message: 'Internal Server Error' })
         }
     }
 })
@@ -90,10 +87,15 @@ router.post('/user/login', async (req, res) => {
     }
 
     if (!isExistAccount.verified) {
-        await sendEmail(email, "Verify Email", urlToEmail)
-        res.status(200).json({ message: 'Check your email' })
-        const urlToEmail = `https://hyper-studio.onrender.com/users/${isExistAccount._id}/verify`
-        return
+        const urlToEmail = `https://hyper-studio.onrender.com/users/${isExistAccount._id}`
+        sendEmail(email, "Verify Email", urlToEmail)
+            .then(() => {
+                res.status(200).json({ message: 'Check your email', verified: false })
+            })
+            .catch((err) => {
+                res.status(400).json(err)
+            })
+        return;
     }
 
     const token = generateToken(isExistAccount._id)
@@ -101,7 +103,8 @@ router.post('/user/login', async (req, res) => {
         user: {
             username: isExistAccount.username,
             token,
-            src: isExistAccount.src
+            src: isExistAccount.src,
+            verified: true
         }
     })
 })
@@ -123,4 +126,8 @@ router.get('/users', async (req, res) => {
     res.status(200).json({ users })
 })
 
-export default router
+
+
+
+
+module.exports = router

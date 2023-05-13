@@ -1,41 +1,36 @@
-import express from "express"
-import * as dotenv from "dotenv"
-dotenv.config()
-import { createServer } from "http"
-import UserRoutes from "./routes/user.js"
-import PostRoutes from "./routes/post.js"
-import mongoose from "mongoose"
-import cors from "cors"
-import { Server } from "socket.io"
-import { fileURLToPath } from "url"
-import path, { dirname } from "path"
-import GlobalChat from "./models/globalChat.js"
-import Post from "./models/Post.js"
-import ChatRoutes from "./routes/chat.js"
-import OnlyChat from "./models/OnlyChat.js"
+const express = require('express')
+require('dotenv').config()
+const { createServer } = require('http')
+const UserRoutes = require('./routes/user')
+const PostRoutes = require('./routes/post')
+const mongoose = require('mongoose')
+const cors = require('cors')
+const { Server } = require('socket.io')
+const GlobalChat = require('./models/globalChat')
+const Post = require('./models/Post.js')
+const ChatRoutes = require('./routes/chat.js')
+const OnlyChat = require('./models/OnlyChat.js')
+
 const app = express()
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
 
 app.use('/routes/uploads/', express.static('./routes/uploads'))
 app.use(express.json())
 app.use(cors({
     origin: 'https://hyper-studio.onrender.com',
-    allowedHeaders: '*'
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
 }))
-
 
 app.use('/api', UserRoutes)
 app.use('/api', PostRoutes)
 app.use('/api', ChatRoutes)
 
 
-
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
         origin: 'https://hyper-studio.onrender.com',
-        methods: ['GET', 'POST', 'PUT'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: '*'
     },
 })

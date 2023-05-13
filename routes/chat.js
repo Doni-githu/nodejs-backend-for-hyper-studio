@@ -1,6 +1,5 @@
-import { Router } from "express";
-import OnlyChat from "../models/OnlyChat.js"
-
+const OnlyChat = require('../models/OnlyChat.js')
+const Router = require('express').Router
 const router = Router()
 
 router.post('/gen', async (req, res, next) => {
@@ -37,4 +36,4 @@ router.get('/gened/:id', async (req, res) => {
     res.status(200).json({ messages: chat })
 })
 
-export default router
+module.exports = router

@@ -1,6 +1,5 @@
-import nodemailer from "nodemailer"
-
-export default async function (email, subject, text) {
+const nodemailer = require('nodemailer')
+module.exports = async function (email, subject, text) {
     try {
         const transporter = nodemailer.createTransport({
             host: "smtp.gmail.com",
@@ -8,19 +7,19 @@ export default async function (email, subject, text) {
             port: 587,
             secure: true,
             auth: {
-                user: "ddonierov96@gmail.com",
-                pass: "ithpzejufpumwkso",
+                user: 'ddonierov96@gmail.com',
+                pass: 'cofdvlcjnvmhcosl',
             }
         })
 
         const info = await transporter.sendMail({
-            from: process.env.USER,
+            from: 'ddonierov96@gmail.com',
             to: email,
             subject,
             text
         })
         console.log('Successfuly')
     } catch (error) {
-        console.log('Failur')
+        console.log('Failur', error)
     }
 }

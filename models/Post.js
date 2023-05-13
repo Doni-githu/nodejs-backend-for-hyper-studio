@@ -1,5 +1,4 @@
-import { model, Schema } from "mongoose";
-
+const { model, Schema } = require('mongoose')
 const PostSchema = new Schema({
     user: { type: Schema.Types.ObjectId, ref: 'User' },
     src: { type: String, required: true },
@@ -24,4 +23,4 @@ const PostSchema = new Schema({
 }, { timestamps: true })
 
 const Post = model('Post', PostSchema)
-export default Post
+module.exports = Post
