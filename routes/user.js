@@ -3,13 +3,16 @@ const User = require('../models/User.js')
 const { generateToken, getToken } = require('../jwt/token.js')
 const bcrypt = require('bcrypt')
 const multer = require('multer')
-const v4 = require('uuid').v4
+const { v4 } = require('uuid')
 const sendEmail = require('../utils/sendEmail.js')
 const url = require('../staticUrl.js')
 const passport = require('passport')
 const router = Router()
 const path = require('path')
 
+function generateNumber() {
+    return parseInt(Math.random() * 100000)
+}
 
 const disk = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -45,11 +48,19 @@ router.post('/user', upload.single('image'), async (req, res) => {
         password: hashPassword,
         src: `${url}avatar/${filename}`
     }
-
+    const code = generateNumber()
     const { _id } = await User.create(newObject)
-    const urlToEmail = `https://hyper-studio.netlify.app/users/${_id}`
-    await sendEmail(email, "Verify Email", urlToEmail)
-    res.status(200).json({ messsage: 'Check your email' })
+    const urlToEmail = `
+        <h1>
+            <strong>Your verify code ${code}</strong>
+        </h1>
+    `
+    sendEmail(email, "Verify Email", urlToEmail)
+        .then(() => {
+            res.status(200).json({ messsage: 'Check your email', code, id: _id })
+        }).catch((err) => {
+            res.status(500).json({ message: 'Failur to connect, please login' })
+        })
 
 })
 
@@ -89,10 +100,16 @@ router.post('/user/login', async (req, res) => {
     }
 
     if (!isExistAccount.verified) {
-        const urlToEmail = `https://hyper-studio.onrender.com/users/${isExistAccount._id}`
+        const code = generateNumber()
+        const urlToEmail = `
+        <h1>
+            <strong>Your verify code ${code}</strong>
+        </h1>
+            
+        `
         sendEmail(email, "Verify Email", urlToEmail)
             .then(() => {
-                res.status(200).json({ message: 'Check your email', verified: false })
+                res.status(200).json({ message: 'Check your email', verified: false, code, id: isExistAccount._id})
             })
             .catch((err) => {
                 res.status(400).json(err)
@@ -106,7 +123,8 @@ router.post('/user/login', async (req, res) => {
             username: isExistAccount.username,
             token,
             src: isExistAccount.src,
-            verified: true
+            verified: true,
+            id: isExistAccount._id
         }
     })
 })
@@ -127,8 +145,6 @@ router.get('/users', async (req, res) => {
     const users = await User.find().select('_id username src')
     res.status(200).json({ users })
 })
-
-
 
 
 

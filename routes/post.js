@@ -30,7 +30,6 @@ const upload = multer({
 router.post('/post', upload.single('image'), async (req, res) => {
     const { filename } = req.file
     const { userId } = getToken(req.headers.authorization.replace('Token ', '')).payload
-    // console.log(url)
     const newObject = {
         ...req.body,
         src: `${url}post/${filename}`,

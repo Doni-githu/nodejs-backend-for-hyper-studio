@@ -1,25 +1,27 @@
 const nodemailer = require('nodemailer')
 module.exports = async function (email, subject, text) {
-    try {
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            service: "gmail",
-            port: 587,
-            secure: true,
-            auth: {
-                user: 'ddonierov96@gmail.com',
-                pass: 'cofdvlcjnvmhcosl',
-            }
-        })
+    return new Promise(async (resolve, reject) => {
+        try {
+            const transporter = nodemailer.createTransport({
+                host: "smtp.gmail.com",
+                service: "gmail",
+                port: 587,
+                secure: true,
+                auth: {
+                    user: process.env.USER,
+                    pass: process.env.PASS,
+                }
+            })
 
-        const info = await transporter.sendMail({
-            from: 'ddonierov96@gmail.com',
-            to: email,
-            subject,
-            text
-        })
-        console.log('Successfuly')
-    } catch (error) {
-        console.log('Failur', error)
-    }
+            const info = await transporter.sendMail({
+                from: process.env.USER,
+                to: email,
+                subject,
+                html: text
+            })
+            resolve(info)
+        } catch (error) {
+            reject(error)
+        }
+    })
 }
