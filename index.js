@@ -16,7 +16,7 @@ const app = express()
 app.use('/routes/uploads/', express.static('./routes/uploads'))
 app.use(express.json())
 app.use(cors({
-    origin: 'https://hyper-studio.onrender.com/',
+    origin: 'https://hyper-studio.onrender.com',
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }))
@@ -29,7 +29,7 @@ app.use('/api', ChatRoutes)
 const server = createServer(app)
 const io = new Server(server, {
     cors: {
-        origin: 'https://hyper-studio.onrender.com/',
+        origin: 'https://hyper-studio.onrender.com',
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         allowedHeaders: '*'
     },
