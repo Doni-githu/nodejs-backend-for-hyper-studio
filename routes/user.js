@@ -4,9 +4,8 @@ const { generateToken, getToken } = require('../jwt/token.js')
 const bcrypt = require('bcrypt')
 const multer = require('multer')
 const { v4 } = require('uuid')
-const sendEmail = require('../utils/sendEmail.js')
+const sendEmail = require('../utils/sendEmail')
 const url = require('../staticUrl.js')
-const passport = require('passport')
 const router = Router()
 const path = require('path')
 
@@ -49,7 +48,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
         src: `${url}avatar/${filename}`
     }
     const code = generateNumber()
-    const { _id } = await User.create(newObject)
+    const user = await User.create(newObject)
     const urlToEmail = `
         <h1>
             <strong>Your verify code ${code}</strong>
@@ -57,7 +56,7 @@ router.post('/user', upload.single('image'), async (req, res) => {
     `
     sendEmail(email, "Verify Email", urlToEmail)
         .then(() => {
-            res.status(200).json({ messsage: 'Check your email', code, id: _id })
+            res.status(200).json({ messsage: 'Check your email', code, id: user._id })
         }).catch((err) => {
             res.status(500).json({ message: 'Failur to connect, please login' })
         })
@@ -109,7 +108,7 @@ router.post('/user/login', async (req, res) => {
         `
         sendEmail(email, "Verify Email", urlToEmail)
             .then(() => {
-                res.status(200).json({ message: 'Check your email', verified: false, code, id: isExistAccount._id})
+                res.status(200).json({ message: 'Check your email', verified: false, code, id: isExistAccount._id })
             })
             .catch((err) => {
                 res.status(400).json(err)
